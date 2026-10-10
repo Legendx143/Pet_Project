@@ -231,7 +231,7 @@ export default function PetCareDashboard() {
       recorder.ondataavailable = (event) => {
         if (event.data.size) chunks.push(event.data);
       };
-      recorder.onstop = () => {
+      recorder.onstop = async () => {
         stream.getTracks().forEach((track) => track.stop());
         if (recognitionRef.current) {
           try { recognitionRef.current.stop(); } catch {}
@@ -241,6 +241,27 @@ export default function PetCareDashboard() {
         if (voice.size) {
           if (target === "symptom") setSymptomVoice(voice);
           else setOnsetVoice(voice);
+
+          try {
+            const formData = new FormData();
+            formData.append("audio", voice, "recording.webm");
+            const resp = await fetch(`${BACKEND_URL}/api/transcribe`, {
+              method: "POST",
+              body: formData,
+            });
+            if (resp.ok) {
+              const data = await resp.json();
+              if (data.text) {
+                if (target === "symptom") {
+                  setDescription((prev) => (prev ? `${prev.trim()} ${data.text}` : data.text));
+                } else {
+                  setOnsetText((prev) => (prev ? `${prev.trim()} ${data.text}` : data.text));
+                }
+              }
+            }
+          } catch (e) {
+            console.log("Transcription error:", e);
+          }
         }
         setRecordingTarget(null);
       };

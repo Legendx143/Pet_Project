@@ -108,7 +108,7 @@ async function requireAuth(req, res, next) {
   }
 
   const token = authHeader.split(" ")[1];
-  
+
   if (token.startsWith("demo_mode_token_") || token.startsWith("demo-token") || token.length < 30) {
     req.authUser = { id: "demo-user-id", email: "demo@example.com" };
     req.authToken = token;
@@ -266,8 +266,8 @@ function generateSmartAssessment(input, transcript, onsetTranscript) {
     triage_reason: isUrgent
       ? "Critical warning signs detected in pet description. Immediate emergency veterinary evaluation is recommended."
       : isConsult
-      ? `Symptoms noticed ${onset} warrant a professional veterinary evaluation in the near future.`
-      : `Symptoms appear mild without immediate red flags. Monitor your ${species} closely over the next 24 hours.`,
+        ? `Symptoms noticed ${onset} warrant a professional veterinary evaluation in the near future.`
+        : `Symptoms appear mild without immediate red flags. Monitor your ${species} closely over the next 24 hours.`,
     monitoring_plan: {
       care_steps: [
         `Provide a quiet, comfortable resting environment for your ${species}.`,
@@ -486,6 +486,21 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+// POST /api/transcribe — standalone voice transcription endpoint
+app.post("/api/transcribe", upload.single("audio"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No audio file provided." });
+    }
+    const text = await transcribeAudio(req.file.buffer, req.file.mimetype, req.file.originalname || "recording.webm");
+    const cleanText = text === "[Voice recording provided]" ? "" : text;
+    res.json({ text: cleanText });
+  } catch (err) {
+    console.error("Transcription endpoint error:", err);
+    res.status(500).json({ error: "Transcription failed" });
+  }
+});
+
 // ---------------------------------------------------------------------------
 // POST /api/assess — main assessment endpoint
 // Accepts multipart form data with:
@@ -602,7 +617,7 @@ app.post(
 
       // ---- Create assessment record (status: processing) ----
       let saved = { id: "demo-assessment-" + Date.now() };
-      
+
       if (!req.isDemo) {
         const { data: dbSaved, error: insertError } = await supabaseAdmin
           .from("assessments")
@@ -703,7 +718,7 @@ app.post(
           analysisError instanceof Error
             ? analysisError.message
             : "Assessment failed.";
-            
+
         if (!req.isDemo) {
           await supabaseAdmin
             .from("assessments")
