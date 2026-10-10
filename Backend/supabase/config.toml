@@ -1,0 +1,4 @@
+[functions.analyze-pet-assessment]
+# Keep the default JWT gateway verification enabled. The function also verifies
+# the caller with Supabase Auth before reading or writing any user data.
+verify_jwt = true
