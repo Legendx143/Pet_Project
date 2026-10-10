@@ -222,21 +222,43 @@ function generateSmartAssessment(input, transcript, onsetTranscript) {
   const triage = isUrgent ? "URGENT" : isConsult ? "CONSULT" : "MONITOR";
   const onset = (input.onsetText || onsetTranscript || "recently").trim();
 
+  let cond1 = `Mild ${speciesTitle} Health Irritation`;
+  let cond2 = "Dietary or Sensitivity Reaction";
+  let cond3 = "General Stress or Mild Fatigue";
+
+  if (/limping|leg|paw|joint|pain|walk/i.test(rawText)) {
+    cond1 = `Mild ${speciesTitle} Musculoskeletal Strain`;
+    cond2 = "Minor Soft Tissue Discomfort";
+    cond3 = "Environmental or Exercise Fatigue";
+  } else if (/scratching|skin|itch|fur|hair|rash/i.test(rawText)) {
+    cond1 = `Dermatological Irritation in ${speciesTitle}`;
+    cond2 = "Environmental or Seasonal Allergy";
+    cond3 = "Mild Contact Sensitivity";
+  } else if (/vomit|diarrhea|stomach|appetite|eating|stool/i.test(rawText)) {
+    cond1 = `Mild ${speciesTitle} Gastrointestinal Upset`;
+    cond2 = "Dietary Indiscretion or Food Sensitivity";
+    cond3 = "Temporary Stomach Upset";
+  } else if (/cough|sneeze|nasal|breathing|eye|runny/i.test(rawText)) {
+    cond1 = `Upper Respiratory Irritation in ${speciesTitle}`;
+    cond2 = "Mild Environmental Sensitivity";
+    cond3 = "Minor Seasonal Irritation";
+  }
+
   return {
     probable_conditions: [
       {
-        name: `Mild ${speciesTitle} Health Irritation`,
-        explanation: `Observed symptoms starting ${onset} are consistent with mild environmental, dietary, or fatigue factors in a ${age}-year-old ${species}.`,
+        name: cond1,
+        explanation: `Observed symptoms starting ${onset} are consistent with reported signs in a ${age}-year-old ${species}.`,
         likelihood: "more consistent"
       },
       {
-        name: "Dietary or Sensitivity Reaction",
-        explanation: "Temporary stomach or skin sensitivity caused by recent food or environmental changes.",
+        name: cond2,
+        explanation: `Potential reaction or sensitivity observed recently in your ${species}.`,
         likelihood: "possible"
       },
       {
-        name: "General Stress or Mild Fatigue",
-        explanation: "Changes in routine or activity levels can temporarily affect energy and appetite.",
+        name: cond3,
+        explanation: `Changes in routine, activity, or environment can temporarily affect your ${species}.`,
         likelihood: "less consistent"
       }
     ],
@@ -362,7 +384,7 @@ async function analyseWithOpenRouter(input, transcript, onsetTranscript, image) 
     return generateSmartAssessment(input, transcript, onsetTranscript);
   }
 
-  const model = process.env.OpenRouter_API_KEY || process.env.OPENROUTER_API_KEY ? "openrouter/auto" : (process.env.OPENAI_MODEL || "gpt-4o");
+  const model = process.env.OPENROUTER_MODEL || process.env.OPENAI_MODEL || "openai/gpt-4o-mini";
 
   const inputJson = JSON.stringify({
     species: input.species,
