@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { isSupabaseConfigured, supabase } from "./supabaseClient.js";
 
-const BACKEND_URL = "http://localhost:3001";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? "http://localhost:3001" : "");
 const MAX_MEDIA_BYTES = 8 * 1024 * 1024;
 const timeReference = /\b(since|for|today|yesterday|this morning|last night|hour|hours|day|days|week|weeks|month|months|morning|afternoon|evening)\b/i;
 
