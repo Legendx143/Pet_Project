@@ -34,3 +34,9 @@ PetCare AI instantly synthesizes multimodal observations into clear triage tiers
 | **Deployment** | Vercel (Frontend & Serverless Integration) |
 ---
 *Built with ❤️ for pets and the people who love them.*
+
+
+
+### 👤 Author
+- **Supriyo Halder** - GitHub: [@Legendx143](https://github.com/Legendx143)
+- Built for **CodeStorm 2026: FutureForge**
