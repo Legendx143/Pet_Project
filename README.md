@@ -37,6 +37,8 @@ PetCare AI instantly synthesizes multimodal observations into clear triage tiers
 
 
 
+▶️ Demo Video: https://www.youtube.com/watch?v=Xz2614vvBaI&t=3s
+
 ### 👤 Author
 - **Supriyo Halder** - GitHub: [@Legendx143](https://github.com/Legendx143)
 - Built for **CodeStorm 2026: FutureForge**
